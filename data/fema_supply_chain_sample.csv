@@ -1,0 +1,6 @@
+shipment_id,disaster_id,disaster_type,item_id,item_name,category,subcategory,quantity_requested,quantity_shipped,quantity_received,warehouse,region,ship_date,arrival_date,transport_mode,supplier,unit_cost,total_cost,delay_days,shortage_flag
+SHP0001,DR-4339,Hurricane,1001,Water Bottles,Food & Water,Beverage,5000,4800,4700,Atlanta,Region IV,2017-09-12,2017-09-15,Truck,BlueRiver Logistics,0.50,2400,3,1
+SHP0002,DR-4339,Hurricane,2003,Meal Kits,Food & Water,Meal,3000,3000,2950,Atlanta,Region IV,2017-09-12,2017-09-16,Truck,BlueRiver Logistics,1.20,3600,4,1
+SHP0003,DR-4339,Hurricane,3002,Tarps,Shelter,Protection,1500,1500,1500,Dallas,Region VI,2017-09-13,2017-09-17,Truck,SafeCover Inc,3.50,5250,4,0
+SHP0004,DR-4339,Hurricane,4001,Generators,Power,Equipment,200,180,175,Dallas,Region VI,2017-09-13,2017-09-20,Truck,PowerGrid Supply,450,81000,7,1
+SHP0005,DR-4339,Hurricane,5002,Blankets,Shelter,Warmth,4000,4000,3980,Atlanta,Region IV,2017-09-14,2017-09-17,Truck,ComfortCo,2.00,8000,3,0
