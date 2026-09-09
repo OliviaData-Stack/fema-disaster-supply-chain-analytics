@@ -1,5 +1,6 @@
 📦 FEMA Supply Chain Data Cleaning & Analysis
 A full SQL-based data cleaning pipeline with anomaly detection and operational KPIs
+
 📘 Project Overview
 This project demonstrates a complete, end‑to‑end data cleaning and analysis workflow for a FEMA supply‑chain dataset.
 The dataset includes shipments, costs, delays, shortages, suppliers, warehouses, and disaster response logistics.
