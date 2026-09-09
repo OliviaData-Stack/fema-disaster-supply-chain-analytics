@@ -7,26 +7,27 @@ The dataset includes shipments, costs, delays, shortages, suppliers, warehouses,
 
 The goal of this project is to:
 
-Clean and standardize raw operational data
+  Clean and standardize raw operational data
 
-Recalculate key fields to ensure accuracy
+  Recalculate key fields to ensure accuracy
 
-Detect anomalies and data quality issues
+  Detect anomalies and data quality issues
 
-Build meaningful KPIs used in real federal logistics operations
+  Build meaningful KPIs used in real federal logistics operations
 
-Prepare the dataset for Power BI dashboards and deeper analysis
+  Prepare the dataset for Power BI dashboards and deeper analysis
 
 This project reflects real-world practices used in FEMA, DoD, DHS, and emergency logistics environments.
 
 🛠️ Technologies Used
-SQL (MySQL)
 
-Excel (verification & QA)
+  SQL (MySQL)
 
-Power BI (analysis-ready dataset)
+  Excel (verification & QA)
 
-GitHub (portfolio documentation)
+  Power BI (analysis-ready dataset)
+
+  GitHub (portfolio documentation)
 
 🔧 Data Cleaning Pipeline (Steps 1–11)
 Each step below includes the reason behind the transformation — this is what hiring managers look for.
@@ -111,6 +112,7 @@ Shows how often shipments fail to meet requested quantities.
 
 8. Top 10 Most Expensive Shipments
 Helps identify cost anomalies, emergency shipments, or data errors.
+
 📁 Project Structure
 /data                → raw & cleaned datasets  
 /sql                 → cleaning scripts & KPI queries  
