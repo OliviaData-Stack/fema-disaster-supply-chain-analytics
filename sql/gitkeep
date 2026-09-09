@@ -1,1 +1,164 @@
+1. Create database
 
+CREATE DATABASE fema_project;
+2. Select database
+
+USE fema_project;
+
+3. Create raw FEMA table
+
+CREATE TABLE fema_supply_chain_full (
+    shipment_id VARCHAR(20),
+    disaster_id VARCHAR(20),
+    disaster_type VARCHAR(50),
+    item_id INT,
+    item_name VARCHAR(500),
+    category VARCHAR(50),
+    subcategory VARCHAR(50),
+    quantity_requested INT,
+    quantity_shipped INT,
+    quantity_received INT,
+    warehouse VARCHAR(50),
+    region VARCHAR(50),
+    ship_date DATE,
+    arrival_date DATE,
+    transport_mode VARCHAR(20),
+    supplier VARCHAR(100),
+    unit_cost DECIMAL(10,2),
+    total_cost DECIMAL(10,2),
+    delay_days INT,
+    shortage_flag INT
+);
+4. Load dataset
+
+LOAD DATA INFILE '/path/to/fema_supply_chain_full.csv'
+INTO TABLE fema_supply_chain_full
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+5. Verify import
+
+SELECT COUNT(*) FROM fema_supply_chain_full;
+
+⭐ DATA CLEANING PIPELINE
+
+6. Standardize text formatting
+
+UPDATE fema_supply_chain_full
+SET warehouse = UPPER(warehouse);
+
+UPDATE fema_supply_chain_full
+SET disaster_type = CONCAT(
+    UPPER(LEFT(disaster_type, 1)),
+    LOWER(SUBSTRING(disaster_type, 2))
+);
+
+UPDATE fema_supply_chain_full
+SET 
+    disaster_id = TRIM(disaster_id),
+    disaster_type = TRIM(disaster_type),
+    item_name = TRIM(item_name),
+    category = TRIM(category),
+    subcategory = TRIM(subcategory),
+    warehouse = TRIM(warehouse),
+    region = TRIM(region),
+    transport_mode = TRIM(transport_mode),
+    supplier = TRIM(supplier);
+
+7. Fix supplier capitalization
+
+UPDATE fema_supply_chain_full
+SET supplier = CONCAT(
+    UPPER(LEFT(TRIM(supplier), 1)),
+    LOWER(SUBSTRING(TRIM(supplier), 2))
+);
+8. Fix missing arrival dates
+
+UPDATE fema_supply_chain_full
+SET arrival_date = DATE_ADD(ship_date, INTERVAL delay_days DAY)
+WHERE arrival_date IS NULL AND delay_days IS NOT NULL;
+
+9. Correct total_cost
+
+UPDATE fema_supply_chain_full
+SET total_cost = unit_cost * quantity_shipped
+WHERE total_cost <> (unit_cost * quantity_shipped);
+
+10. Recalculate shortage_flag
+
+UPDATE fema_supply_chain_full
+SET shortage_flag = CASE
+    WHEN quantity_requested > quantity_received THEN 1
+    ELSE 0
+END;
+
+
+⭐ ADD NEW COLUMNS 
+
+11. Add lead_time_days
+
+ALTER TABLE fema_supply_chain_full
+ADD COLUMN lead_time_days INT;
+
+UPDATE fema_supply_chain_full
+SET lead_time_days = DATEDIFF(arrival_date, ship_date);
+
+12. Add delay_flag
+
+ALTER TABLE fema_supply_chain_full
+ADD COLUMN delay_flag INT;
+
+UPDATE fema_supply_chain_full
+SET delay_flag = CASE
+    WHEN delay_days > 0 THEN 1
+    ELSE 0
+END;
+
+13. Add cost_per_unit
+
+ALTER TABLE fema_supply_chain_full
+ADD COLUMN cost_per_unit DECIMAL(10,2);
+
+UPDATE fema_supply_chain_full
+SET cost_per_unit = ROUND(total_cost / quantity_shipped, 2)
+WHERE quantity_shipped > 0;
+
+14. Add anomaly_flag
+
+ALTER TABLE fema_supply_chain_full
+ADD COLUMN anomaly_flag INT DEFAULT 0;
+
+UPDATE fema_supply_chain_full
+SET anomaly_flag = 1
+WHERE lead_time_days < 0;
+
+⭐ DATA QUALITY CHECKS
+Negative quantities
+
+SELECT *
+FROM fema_supply_chain_full
+WHERE quantity_shipped < 0
+   OR quantity_requested < 0
+   OR quantity_received < 0;
+
+Negative or zero cost
+
+SELECT *
+FROM fema_supply_chain_full
+WHERE total_cost < 0
+   OR (quantity_shipped > 0 AND total_cost = 0);
+
+Negative lead times
+
+SELECT *
+FROM fema_supply_chain_full
+WHERE lead_time_days < 0;
+
+Validate shortage_flag
+
+SELECT shipment_id, quantity_requested, quantity_received, shortage_flag
+FROM fema_supply_chain_full
+WHERE (quantity_requested > quantity_received AND shortage_flag = 0)
+   OR (quantity_requested <= quantity_received AND shortage_flag = 1);
